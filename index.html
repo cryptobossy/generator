@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Generador de Enlace con Parámetros</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+  <div class="bg-white p-8 rounded shadow-md w-full max-w-lg">
+    <h1 class="text-2xl font-bold mb-4 text-center">Generador de Enlace</h1>
+    <form id="linkForm" class="space-y-4">
+      <div>
+        <label class="block font-semibold mb-1" for="baseUrl">Enlace base</label>
+        <input id="baseUrl" type="text" required placeholder="https://ejemplo.com/pago"
+          class="w-full border px-3 py-2 rounded focus:outline-none focus:ring focus:border-blue-300">
+      </div>
+      <div id="paramsContainer" class="space-y-2">
+        <!-- Campos de parámetros generados por JS -->
+      </div>
+      <button type="submit"
+        class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition">Generar enlace</button>
+    </form>
+    <div id="result" class="mt-6 text-center"></div>
+  </div>
+  <script>
+    // Parámetros desde el archivo text
+    const params = [
+      { key: "ac", label: "Cuenta Objetivo" },
+      { key: "ap", label: "Cuenta - Producto" },
+      { key: "a", label: "Cuenta" },
+      { key: "pd", label: "Precio y descripción del producto" },
+      { key: "s", label: "Texto sobre cuanto ahorra" },
+      { key: "sa", label: "Cuenta" },
+      { key: "pi", label: "URL de imagen" }
+    ];
+
+    // Generar campos de entrada para los parámetros
+    const paramsContainer = document.getElementById('paramsContainer');
+    params.forEach(param => {
+      const div = document.createElement('div');
+      div.innerHTML = `
+        <label class="block font-medium mb-1" for="${param.key}">${param.label} (${param.key})</label>
+        <input id="${param.key}" name="${param.key}" type="text"
+          class="w-full border px-3 py-2 rounded focus:outline-none focus:ring focus:border-blue-300">
+      `;
+      paramsContainer.appendChild(div);
+    });
+
+    // Manejar el formulario
+    document.getElementById('linkForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const baseUrl = document.getElementById('baseUrl').value.trim();
+      if (!baseUrl) return;
+
+      const url = new URL(baseUrl, window.location.origin);
+      params.forEach(param => {
+        const value = document.getElementById(param.key).value.trim();
+        if (value) url.searchParams.set(param.key, value);
+      });
+
+      const resultDiv = document.getElementById('result');
+      resultDiv.innerHTML = `
+        <div class="bg-green-100 text-green-800 p-4 rounded break-all">
+          <span class="font-semibold">Enlace generado:</span><br>
+          <a href="${url.href}" class="text-blue-700 underline break-all" target="_blank">${url.href}</a>
+        </div>
+      `;
+    });
+  </script>
+</body>
+</html>
